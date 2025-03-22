@@ -6,10 +6,13 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private UIManager uiManager;
     [SerializeField] private BuildingPlacer buildingPlacer;
     [SerializeField] private DataManager dataManager;
+    [SerializeField] private GameInput gameInput;
+    [SerializeField] private BuildingPrefabData buildingPrefabData;
 
     private void Start()
     {
         InitializeGridManager();
+        InitializeGameInput();
         InitializeUIManager();
         InitializeBuildingPlacer();
 
@@ -22,6 +25,11 @@ public class Bootstrap : MonoBehaviour
         Debug.Log("GridManager initialized.");
     }
 
+    private void InitializeGameInput()
+    {
+        gameInput.InitializeInput();
+    }
+
     private void InitializeUIManager()
     {
         uiManager.Initialize(buildingPlacer);
@@ -30,7 +38,7 @@ public class Bootstrap : MonoBehaviour
 
     private void InitializeBuildingPlacer()
     {
-        buildingPlacer.Initialize(gridManager, dataManager);
+        buildingPlacer.Initialize(gridManager, dataManager, buildingPrefabData);
         Debug.Log("BuildingPlacer initialized.");
     }
 
@@ -39,8 +47,12 @@ public class Bootstrap : MonoBehaviour
         foreach (var buildingData in dataManager.GetBuildingsData())
         {
             GameObject building = Instantiate(buildingPlacer.GetBuildingPrefab(buildingData.buildingIndex));
-            building.transform.position = buildingData.position;
-            gridManager.OccupyCell(buildingData.position);
+
+            if (building != null) 
+            {
+                building.transform.position = buildingData.position;
+                gridManager.OccupyCell(buildingData.position);
+            }
         }
         Debug.Log("Buildings loaded.");
     }

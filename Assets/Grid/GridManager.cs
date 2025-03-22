@@ -20,46 +20,48 @@ public class GridManager : MonoBehaviour
 
     public Vector2 GetNearestPointOnGrid(Vector2 position)
     {
-        position -= gridOffset;
-
-        int x = Mathf.RoundToInt(position.x / cellSize);
-        int y = Mathf.RoundToInt(position.y / cellSize);
-
-        return new Vector2(x * cellSize, y * cellSize) + gridOffset;
+        Vector2Int cellIndex = GetCellIndex(position);
+        return new Vector2(cellIndex.x * cellSize, cellIndex.y * cellSize) + gridOffset;
     }
 
     public bool IsCellOccupied(Vector2 position)
     {
-        position -= gridOffset;
+        Vector2Int cellIndex = GetCellIndex(position);
 
-        int x = Mathf.RoundToInt(position.x / cellSize);
-        int y = Mathf.RoundToInt(position.y / cellSize);
-
-        if (x < 0 || x >= gridSize || y < 0 || y >= gridSize)
+        if (IsIndexOutOfBounds(cellIndex))
             return true;
 
-        return grid[x, y];
+        return grid[cellIndex.x, cellIndex.y];
     }
 
     public void OccupyCell(Vector2 position)
     {
-        position -= gridOffset;
+        Vector2Int cellIndex = GetCellIndex(position);
 
-        int x = Mathf.RoundToInt(position.x / cellSize);
-        int y = Mathf.RoundToInt(position.y / cellSize);
-
-        if (x >= 0 && x < gridSize && y >= 0 && y < gridSize)
-            grid[x, y] = true;
+        if (!IsIndexOutOfBounds(cellIndex))
+            grid[cellIndex.x, cellIndex.y] = true;
     }
 
     public void FreeCell(Vector2 position)
+    {
+        Vector2Int cellIndex = GetCellIndex(position);
+
+        if (!IsIndexOutOfBounds(cellIndex))
+            grid[cellIndex.x, cellIndex.y] = false;
+    }
+
+    private Vector2Int GetCellIndex(Vector2 position)
     {
         position -= gridOffset;
 
         int x = Mathf.RoundToInt(position.x / cellSize);
         int y = Mathf.RoundToInt(position.y / cellSize);
 
-        if (x >= 0 && x < gridSize && y >= 0 && y < gridSize)
-            grid[x, y] = false;
+        return new Vector2Int(x, y);
+    }
+
+    private bool IsIndexOutOfBounds(Vector2Int cellIndex)
+    {
+        return cellIndex.x < 0 || cellIndex.x >= gridSize || cellIndex.y < 0 || cellIndex.y >= gridSize;
     }
 }

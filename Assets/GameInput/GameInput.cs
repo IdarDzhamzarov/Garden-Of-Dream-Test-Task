@@ -10,7 +10,7 @@ public class GameInput : MonoBehaviour
 
     public event EventHandler OnMouseClickAction;
 
-    private void Awake()
+    public void InitializeInput()
     {
         Instance = this;
 

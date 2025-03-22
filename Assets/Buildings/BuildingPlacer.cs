@@ -13,11 +13,13 @@ public class BuildingPlacer : MonoBehaviour
 
     private GridManager gridManager;
     private DataManager dataManager;
+    [SerializeField] private BuildingPrefabData buildingPrefabData;
 
-    public void Initialize(GridManager gridManager, DataManager dataManager)
+    public void Initialize(GridManager gridManager, DataManager dataManager, BuildingPrefabData buildingPrefabData)
     {
         this.gridManager = gridManager;
         this.dataManager = dataManager;
+        this.buildingPrefabData = buildingPrefabData;
     }
 
     private void Start()
@@ -55,10 +57,12 @@ public class BuildingPlacer : MonoBehaviour
         isPlacing = placing;
         isDeleting = deleting;
 
-
         if (isPlacing && selectedBuildingIndex != -1)
         {
-            currentBuilding = Instantiate(buildingPrefabs[selectedBuildingIndex]);
+            if (currentBuilding == null)
+            {
+                currentBuilding = Instantiate(buildingPrefabData.buildingPrefabs[selectedBuildingIndex]);
+            }
         }
         else if (isDeleting)
         {
@@ -91,6 +95,7 @@ public class BuildingPlacer : MonoBehaviour
             gridManager.OccupyCell(position);
             currentBuilding = null;
             isPlacing = false;
+
             dataManager.SaveBuilding(selectedBuildingIndex, position);
         }
     }
@@ -100,21 +105,23 @@ public class BuildingPlacer : MonoBehaviour
         if (!isDeleting) return;
 
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero, buildingLayerMask);
+        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, buildingLayerMask);
 
         if (hit.collider != null)
         {
-            gridManager.FreeCell(hit.transform.position);
+            Vector2 buildingPosition = hit.transform.position;
+            gridManager.FreeCell(buildingPosition);
             Destroy(hit.collider.gameObject);
-            dataManager.RemoveBuilding(mousePosition);
+
+            dataManager.RemoveBuilding(buildingPosition);
         }
     }
 
     public GameObject GetBuildingPrefab(int index)
     {
-        if (index >= 0 && index < buildingPrefabs.Length)
+        if (index >= 0 && index < buildingPrefabData.buildingPrefabs.Length)
         {
-            return buildingPrefabs[index];
+            return buildingPrefabData.buildingPrefabs[index];
         }
         Debug.LogError("Invalid building index: " + index);
         return null;
