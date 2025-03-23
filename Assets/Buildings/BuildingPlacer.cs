@@ -13,7 +13,7 @@ public class BuildingPlacer : MonoBehaviour
 
     private GridManager gridManager;
     private DataManager dataManager;
-    [SerializeField] private BuildingPrefabData buildingPrefabData;
+    private BuildingPrefabData buildingPrefabData;
 
     public void Initialize(GridManager gridManager, DataManager dataManager, BuildingPrefabData buildingPrefabData)
     {
